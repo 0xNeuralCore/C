@@ -4,8 +4,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define MAX_ITEMS 1000U
+#define MAX_ELEMENTS 1000U
 
+/**
+ * @brief Table element structure
+ * @param b_used    Usage flag
+ * @param u32_id    Unique identifier
+ * @param u64_value Associated value
+ */
 typedef struct STRUCT_ELEMENT_ENTRY
 {
     bool b_used;
@@ -14,28 +20,18 @@ typedef struct STRUCT_ELEMENT_ENTRY
 } TYP_ELEMENT_ENTRY;
 
 /**
- * @brief Ajoute un nouvel élément dans la table avec gestion par hachage simple.
- *
- * Cette fonction calcule l’index de hachage, vérifie l’absence de doublon,
- * puis ajoute l’élément dans le tableau statique et met à jour la table
- * de hachage. En cas de collision, le nouvel élément écrase l’ancien.
- *
- * @param[in] u32_id    Identifiant unique de l’élément.
- * @param[in] u64_value Valeur associée à l’élément.
- * @return true si l’ajout a réussi, false sinon (table pleine).
+ * @brief Adds a new element to the table
+ * @param u32_id    Element unique identifier
+ * @param u64_value Element value
+ * @return true if successful, false if table is full
  */
 bool F_add_element(uint32_t u32_id, uint64_t u64_value);
 
 /**
- * @brief Recherche un élément par son identifiant dans la table hachée.
- *
- * Cette fonction utilise la table de hachage pour accéder directement
- * à l’entrée correspondante. En cas de collision (même index hash),
- * seul le dernier élément ajouté est visible.
- *
- * @param[in]  u32_search_id      Identifiant recherché.
- * @param[out] p_u64_found_value  Pointeur pour stocker la valeur trouvée.
- * @return true si l’élément est trouvé, false sinon.
+ * @brief Searches for an element by its ID
+ * @param u32_search_id     ID to search for
+ * @param p_u64_found_value Pointer to store found value
+ * @return true if found, false otherwise
  */
 bool F_search_element(uint32_t u32_search_id, uint64_t *p_u64_found_value);
 

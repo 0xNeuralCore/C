@@ -1,14 +1,14 @@
 #include "protoB.h"
-#include <stdio.h> /* pour printf */
+#include <stdio.h> /* printf */
 
-static TYP_ELEMENT_ENTRY S_st_table_entry[MAX_ITEMS];
-static TYP_ELEMENT_ENTRY *S_st_hash_table[MAX_ITEMS] = {0};
+static TYP_ELEMENT_ENTRY S_st_table_entry[MAX_ELEMENTS];
+static TYP_ELEMENT_ENTRY *S_st_hash_table[MAX_ELEMENTS] = {0};
 static uint16_t S_u16_item_count = 0U;
 
 /**
- * @brief Fonction de hachage simple : modulo MAX_ITEMS.
- * @param u32_key Clé/id à hacher.
- * @return Index dans la table de hachage.
+ * @brief Simple hash function using modulo HASH_SIZE
+ * @param u32_key Key to hash
+ * @return Hash table index
  */
 static uint32_t F_hash_function(uint32_t u32_key);
 
@@ -17,7 +17,7 @@ static uint32_t F_hash_function(uint32_t u32_key);
  */
 static uint32_t F_hash_function(uint32_t u32_key)
 {
-    return u32_key % MAX_ITEMS; /* ✅ Enlever le +1U */
+    return u32_key % MAX_ELEMENTS;
 }
 
 /**
@@ -30,16 +30,16 @@ bool F_add_element(uint32_t u32_id, uint64_t u64_value)
     uint32_t u32_counter = 0U;
     bool b_continue_loop = true;
 
-    if (S_u16_item_count < MAX_ITEMS)
+    if (S_u16_item_count < MAX_ELEMENTS)
     {
         u32_index = F_hash_function(u32_id);
 
-        /* Vérifie si une entrée existe déjà pour cet ID */
+        /* Check if an entry already exists for this ID */
         if (S_st_hash_table[u32_index] == NULL)
         {
-            /* Recherche d'une case libre dans la table principale */
+            /* Search for a free slot in the main table */
             for (u32_counter = 0U;
-                 (u32_counter < MAX_ITEMS) && (b_continue_loop == true);
+                 (u32_counter < MAX_ELEMENTS) && (b_continue_loop == true);
                  u32_counter++)
             {
                 if (S_st_table_entry[u32_counter].b_used == false)
@@ -48,7 +48,7 @@ bool F_add_element(uint32_t u32_id, uint64_t u64_value)
                     S_st_table_entry[u32_counter].u32_id = u32_id;
                     S_st_table_entry[u32_counter].u64_value = u64_value;
 
-                    /* Mise à jour de la table de hachage */
+                    /* Update the hash table */
                     S_st_hash_table[u32_index] = &S_st_table_entry[u32_counter];
 
                     S_u16_item_count++;
@@ -56,11 +56,6 @@ bool F_add_element(uint32_t u32_id, uint64_t u64_value)
                     b_rc = true;
                 }
             }
-        }
-        else
-        {
-            /* Collision : pas gérée dans ce prototype */
-            b_rc = false;
         }
     }
 
@@ -96,32 +91,20 @@ bool F_search_element(uint32_t u32_search_id, uint64_t *p_u64_found_value)
  */
 int main(void)
 {
-    (void)F_add_element(100U, 84U);
-    (void)F_add_element(200U, 99U);
+    (void)F_add_element(1000U, 84U);
+    (void)F_add_element(2000U, 123U);
 
     uint64_t u64_value = 0U;
-    bool b_found = F_search_element(100U, &u64_value);
-
-    if (b_found == true)
-    {
-        printf("ID 100 -> value = %lu\n", u64_value);
-    }
+    if (F_search_element(1000U, &u64_value))
+        printf("ID 1000 -> value = %lu\n", u64_value);
     else
-    {
-        printf("ID non trouvé\n");
-    }
+        printf("ID 1000 not found\n");
 
-    uint64_t u64_value_2 = 0U;
-    bool b_found_2 = F_search_element(200U, &u64_value_2);
-
-    if (b_found_2 == true)
-    {
-        printf("ID 200 -> value = %lu\n", u64_value_2);
-    }
+    uint64_t u64_value2 = 0U;
+    if (F_search_element(2000U, &u64_value2))
+        printf("ID 2000 -> value = %lu\n", u64_value2);
     else
-    {
-        printf("ID non trouvé\n");
-    }
+        printf("ID 2000 not found\n");
 
     return 0;
 }

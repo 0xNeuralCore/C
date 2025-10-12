@@ -1,5 +1,5 @@
-#ifndef PROTOA_H
-#define PROTOA_H
+#ifndef PROTO_C_H
+#define PROTO_C_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -11,12 +11,14 @@
  * @param b_used    Usage flag
  * @param u32_id    Unique identifier
  * @param u64_value Associated value
+ * @param p_next    Pointer to next element (for collision handling)
  */
 typedef struct STRUCT_ELEMENT_ENTRY
 {
     bool b_used;
     uint32_t u32_id;
     uint64_t u64_value;
+    struct STRUCT_ELEMENT_ENTRY *p_next;
 } TYP_ELEMENT_ENTRY;
 
 /**
@@ -35,4 +37,4 @@ bool F_add_element(uint32_t u32_id, uint64_t u64_value);
  */
 bool F_search_element(uint32_t u32_search_id, uint64_t *p_u64_found_value);
 
-#endif /* PROTOA_H */
+#endif /* PROTO_C_H */

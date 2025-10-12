@@ -1,7 +1,7 @@
 #include "protoA.h"
-#include <stdio.h> /* pour printf */
+#include <stdio.h> /* printf */
 
-static TYP_ELEMENT_ENTRY S_st_table_entry[MAX_ITEMS];
+static TYP_ELEMENT_ENTRY S_st_table_entry[MAX_ELEMENTS];
 static uint16_t S_u16_item_count = 0U;
 
 /**
@@ -13,10 +13,10 @@ bool F_add_element(uint32_t u32_id, uint64_t u64_value)
     uint32_t u32_counter = 0U;
     bool b_continue_loop = true;
 
-    if (S_u16_item_count < MAX_ITEMS)
+    if (S_u16_item_count < MAX_ELEMENTS)
     {
-        /* Recherche d’un emplacement libre */
-        for (u32_counter = 0U; (u32_counter < MAX_ITEMS) && b_continue_loop; u32_counter++)
+        /* Search for a free slot in the main table */
+        for (u32_counter = 0U; (u32_counter < MAX_ELEMENTS) && b_continue_loop; u32_counter++)
         {
             if (S_st_table_entry[u32_counter].b_used == false)
             {
@@ -45,7 +45,7 @@ bool F_search_element(uint32_t u32_search_id, uint64_t *p_u64_found_value)
 
     if (p_u64_found_value != NULL)
     {
-        for (u32_counter = 0U; (u32_counter < MAX_ITEMS) && b_continue_loop; u32_counter++)
+        for (u32_counter = 0U; (u32_counter < MAX_ELEMENTS) && b_continue_loop; u32_counter++)
         {
             if ((S_st_table_entry[u32_counter].b_used == true) &&
                 (S_st_table_entry[u32_counter].u32_id == u32_search_id))
