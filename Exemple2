@@ -1,0 +1,66 @@
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#pragma comment(lib, "ws2_32.lib")
+
+#define SERVER_IP "127.0.0.1"
+#define PORT 5000
+#define BUF_SIZE 65536
+
+int main() {
+    WSADATA wsa;
+    SOCKET sock;
+    struct sockaddr_in server;
+    char *buffer;
+    unsigned long long total = 0;
+    time_t start, now;
+    int sent;
+
+    printf("Initialisation Winsock...\n");
+    if (WSAStartup(MAKEWORD(2,2), &wsa) != 0) {
+        printf("Erreur WSAStartup\n");
+        return 1;
+    }
+
+    sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (sock == INVALID_SOCKET) {
+        printf("Erreur socket()\n");
+        WSACleanup();
+        return 1;
+    }
+
+    server.sin_family = AF_INET;
+    server.sin_port = htons(PORT);
+    inet_pton(AF_INET, SERVER_IP, &server.sin_addr);
+
+    buffer = (char*)malloc(BUF_SIZE);
+    if (!buffer) {
+        printf("Erreur malloc\n");
+        return 1;
+    }
+    memset(buffer, 'A', BUF_SIZE);
+
+    printf("Envoi UDP vers %s:%d pendant 5 secondes...\n", SERVER_IP, PORT);
+
+    time(&start);
+    do {
+        sent = sendto(sock, buffer, BUF_SIZE, 0, (struct sockaddr*)&server, sizeof(server));
+        if (sent < 0) break;
+        total += sent;
+        time(&now);
+    } while (difftime(now, start) < 5.0);
+
+    double seconds = difftime(now, start);
+    double mbps = (total * 8.0) / (seconds * 1000000.0);
+
+    printf("\nEnvoyé : %.2f Mo en %.2f s → %.2f Mbit/s\n",
+           total / (1024.0 * 1024.0), seconds, mbps);
+
+    free(buffer);
+    closesocket(sock);
+    WSACleanup();
+    return 0;
+}
