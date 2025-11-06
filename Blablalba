@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+
+#define FRAME_SIZE   64
+#define HEADER_SIZE  14
+#define PAYLOAD_SIZE (FRAME_SIZE - HEADER_SIZE)
+
+typedef struct {
+    unsigned char header[HEADER_SIZE];
+    unsigned char payload[PAYLOAD_SIZE];
+} Frame;
+
+void build_frame(Frame *f, uint32_t counter) {
+    memset(f->header, 0, HEADER_SIZE);
+    f->header[0] = 0xAB;
+    f->header[1] = 0xCD;
+
+    // Met le compteur (4 octets) au début du payload
+    memcpy(f->payload, &counter, sizeof(counter));
+
+    // Remplit le reste avec une lettre fixe
+    memset(f->payload + sizeof(counter), 'A', PAYLOAD_SIZE - sizeof(counter));
+}
+
+void print_frame(const Frame *f, uint32_t counter) {
+    printf("Frame %u | Header:", counter);
+    for (int i = 0; i < HEADER_SIZE; i++) printf("%02X", f->header[i]);
+    printf(" | Payload: ");
+    for (int i = 0; i < 12; i++) printf("%02X", f->payload[i]); // juste les 12 premiers octets
+    printf("...\n");
+}
+
+int main() {
+    Frame frame;
+    const uint32_t total_frames = 10; // par ex. 10 trames pour la démo
+
+    for (uint32_t i = 0; i < total_frames; i++) {
+        build_frame(&frame, i);
+        print_frame(&frame, i);
+    }
+
+    printf("Simulation terminée (%u trames envoyées, %u octets chacune)\n",
+           total_frames, FRAME_SIZE);
+    return 0;
+}
